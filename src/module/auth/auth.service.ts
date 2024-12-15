@@ -35,14 +35,14 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto) {
     const { email, username } = createUserDto;
-    const user = await this.userRepository.findOneByEmail(email);
-    if (user) {
-      throw new BadRequestException('Email already exists');
-    }
-    const user2 = await this.userRepository.findOneByUsername(username);
-    if (user2) {
-      throw new BadRequestException('Username already exists');
-    }
+    // const user = await this.userRepository.findOneByEmail(email);
+    // if (user) {
+    //   throw new BadRequestException('Email already exists');
+    // }
+    // const user2 = await this.userRepository.findOneByUsername(username);
+    // if (user2) {
+    //   throw new BadRequestException('Username already exists');
+    // }
     const newUser = await this.userRepository.create(createUserDto);
     return newUser
   }

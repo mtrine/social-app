@@ -10,9 +10,10 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import exp from 'constants';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { Response } from 'express';
 import { IUser } from '../users/dto/user.interface';
+import { mock } from 'node:test';
 describe('AuthService', () => {
   let service: AuthService;
   let userRepository: UserRepository;
@@ -136,11 +137,6 @@ describe('AuthService', () => {
 
   describe('register', () => {
     it('should return new user if email and username are not exist', async () => {
-      // Mock userRepository.findOneByEmail để trả về null
-      (userRepository.findOneByEmail as jest.Mock).mockResolvedValue(null);
-
-      // Mock userRepository.findOneByUsername để trả về null
-      (userRepository.findOneByUsername as jest.Mock).mockResolvedValue(null);
 
       const createUserDto = {
         email: 'test@gmail.com',
@@ -154,26 +150,17 @@ describe('AuthService', () => {
       expect(newUser).toEqual(userData);
     });
     it('should throw an error if email already exists', async () => {
-      // Giả lập `findOneByEmail` trả về một user, nghĩa là email đã tồn tại
-      (userRepository.findOneByEmail as jest.Mock).mockResolvedValue(userData);
-      // Giả lập `findOneByUsername` trả về null, nghĩa là username chưa tồn tại
-      (userRepository.findOneByUsername as jest.Mock).mockResolvedValue(null);
-
       // Dữ liệu đầu vào
       const createUserDto = {
-        email: 'test@gmail.com',
+        email: 'qnhu1@gmail.com',
         username: 'test',
         password: 'password',
         name: 'Test User',
         gender: true,
       } as CreateUserDto;
-
+      mockUserRepository.create.mockRejectedValue(new ConflictException());
       // Thực thi hàm `register` và kiểm tra xem ngoại lệ có được ném ra
-      await expect(service.register(createUserDto)).rejects.toThrow(BadRequestException);
-      await expect(service.register(createUserDto)).rejects.toThrow('Email already exists');
-
-      // Kiểm tra mock được gọi chính xác
-      expect(userRepository.findOneByEmail).toHaveBeenCalledWith(createUserDto.email);
+      await expect(service.register(createUserDto)).rejects.toThrow(ConflictException);
     });
   })
 

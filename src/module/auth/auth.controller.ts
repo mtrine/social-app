@@ -2,12 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Res, Req 
 import { AuthService } from './auth.service';
 
 import { LocalAuthGuard } from './guard/local-auth.guard';
-import { User } from 'src/decorators/user-infor.decorator';
 import { IUser } from '../users/dto/user.interface';
 import { Request, Response } from 'express';
 import { ResponseMessage } from 'src/decorators/response-message.decorator';
 import { Public } from 'src/decorators/public.decorator';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { User } from '../../decorators/user-infor.decorator';
+
 
 @Controller('auth')
 export class AuthController {
