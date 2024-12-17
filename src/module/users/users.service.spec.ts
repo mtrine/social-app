@@ -31,6 +31,7 @@ describe('UsersService', () => {
     deleteById: jest.fn().mockResolvedValue(userData),
     findOneByUsername: jest.fn().mockResolvedValue(userData),
     findOneByEmail: jest.fn().mockResolvedValue(userData),
+    searchByUsername: jest.fn().mockResolvedValue([userData])
   }
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -124,5 +125,12 @@ describe('UsersService', () => {
       const result = service.findOneByEmail(userData.email)
       expect(result).rejects.toThrow(BadRequestException)
     })
+  })
+
+  describe('searchByUsername', () => {
+    it('should search users by username', async () => {
+      const result = await service.searchByUsername('qnhu1', { limit: 10, currentPage: 1 });
+      expect(result).toEqual([userData]);
+    });
   })
 });

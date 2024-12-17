@@ -5,6 +5,7 @@ import { Model } from "mongoose";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
 import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class UserRepository {
     constructor(@InjectModel(User.name) private userModel: Model<User>) { }
@@ -20,6 +21,9 @@ export class UserRepository {
         }
     }
 
+    async findById(id: string) {
+        return await this.userModel.findById(id);
+    }
     async findOneByEmail(email: string) {
         try {
             return await this.userModel.findOne({ email }, { isDelete: false });
@@ -39,14 +43,6 @@ export class UserRepository {
                 
     }
 
-    async findAll() {
-        return await this.userModel.find({ isDelete: false });
-    }
-
-    async findById(id: string) {
-        return await this.userModel.findById(id, { isDelete: false });
-    }
-
     async updateById(id: string, user: UpdateUserDto) {
         return await this.userModel.findByIdAndUpdate(id, user)
     }
@@ -55,7 +51,13 @@ export class UserRepository {
         return await this.userModel.findByIdAndUpdate(id, { isDelete: true, DeleteAt: new Date() })
     }
 
-    async searchByUsername(username: string) {
-        return await this.userModel.find({ username: { $regex: username, $options: 'i' }, isDelete: false });
+    async searchByUsername(username: string,take:number,skip:number) {
+        const users = await this.userModel.find({ username: { $regex: username, $options: 'i' }, isDelete: false }).limit(take).skip(skip);
+        return users;
     }
+
+    async countDocuments(condition: any) {
+        return await this.userModel.countDocuments(condition);
+    }
+
 }

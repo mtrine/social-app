@@ -6,6 +6,7 @@ import { AuthModule } from './module/auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
+import { PostsModule } from './module/posts/posts.module';
 import * as redisStore from 'cache-manager-redis-store';
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import * as redisStore from 'cache-manager-redis-store';
       port: process.env.REDIS_PORT,
     }),
     UsersModule, 
-    AuthModule],
+    AuthModule, PostsModule],
   controllers: [AppController],
   providers: [AppService],
 })

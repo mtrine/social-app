@@ -19,13 +19,13 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  ) { }
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userRepository.findOneByEmail(email);
-    if(!user) {
+    if (!user) {
       return null;
     }
-    const isPass= await bcrypt.compare(pass,user.password)
+    const isPass = await bcrypt.compare(pass, user.password)
     if (user && isPass) {
       const { password, ...result } = user;
       return result;
@@ -48,9 +48,9 @@ export class AuthService {
   }
 
   async handleLogin(user: IUser, response: Response) {
-    const {_id, name,username, email, bio, avatar, gender} = user;
+    const { _id, name, username, email, bio, avatar, gender } = user;
 
-    const payload = { 
+    const payload = {
       sub: "token login",
       iss: "from server",
       _id,
@@ -65,24 +65,24 @@ export class AuthService {
     await this.cacheManager.set(`refresh_token:${_id}`, new_refresh_token)
     response.clearCookie("refresh_token")
     response.cookie('refresh_token', new_refresh_token, {
-        httpOnly: true,
-        secure: true,
-        maxAge: +ms(this.configService.get<string>('JWT_REFRESH_EXPIRE')),
-        sameSite: 'none'
-      })
-      return {
-        access_token: this.jwtService.sign(payload),
-        user: {
-          _id,
-          username,
-          name,
-          email,
-          bio,
-          avatar,
-          gender,
-        }
+      httpOnly: true,
+      secure: true,
+      maxAge: +ms(this.configService.get<string>('JWT_REFRESH_EXPIRE')),
+      sameSite: 'none'
+    })
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        _id,
+        username,
+        name,
+        email,
+        bio,
+        avatar,
+        gender,
+      }
+    }
   }
-}
 
   generateRefreshToken(payload: any) {
     const refresh_token = this.jwtService.sign(payload, {
@@ -98,6 +98,7 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
       });
 
+      console.log('decoded', decoded);
       // Get user ID from token
       const userId = decoded._id;
 
@@ -115,7 +116,7 @@ export class AuthService {
         throw new BadRequestException('User not found');
       }
 
-      const { _id, name,username, email, bio, avatar, gender } = user;
+      const { _id, name, username, email, bio, avatar, gender } = user;
 
       const newPayload = {
         sub: 'token login',
@@ -138,7 +139,7 @@ export class AuthService {
       response.cookie('refresh_token', newRefreshToken, {
         httpOnly: true,
         secure: true,
-        maxAge: +this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+        maxAge: +ms(this.configService.get<string>('JWT_REFRESH_EXPIRE')),
         sameSite: 'none',
       });
 
@@ -160,7 +161,7 @@ export class AuthService {
     }
   }
 
-  async handleLogout( user: IUser,  response: Response) {
+  async handleLogout(user: IUser, response: Response) {
     await this.cacheManager.del(`refresh_token:${user._id}`)
     response.clearCookie("refresh_token")
     return "ok"
