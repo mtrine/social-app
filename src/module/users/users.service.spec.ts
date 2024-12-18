@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { find } from 'rxjs';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -35,6 +36,11 @@ describe('UsersService', () => {
     findOneByEmail: jest.fn().mockResolvedValue(userData),
     searchByUsername: jest.fn().mockResolvedValue([userData]),
     countDocuments: jest.fn().mockResolvedValue(1), 
+    findById: jest.fn().mockResolvedValue({
+      ...userData,
+      save: jest.fn().mockResolvedValue(userData), // Mock save
+    }),
+    
   }
   const mockCacheManager = {
     get: jest.fn(),
@@ -150,5 +156,19 @@ describe('UsersService', () => {
       const result = await service.searchByUsername('qnhu1', { limit: 10, currentPage: 1 }) as { data: typeof userData[] };
       expect(result.data).toEqual([userData]);
     });
+  })
+
+  describe('follow user',()=>{
+    it('should follow a user',async()=>{
+      const userFollowed = {
+        _id: '675512d24dd69ef1b4c17417'
+      }
+
+      const result = await service.followUser(userFollowed._id, userData._id);
+
+      const sanitizedResult = { ...result, save: undefined };
+    
+      expect(sanitizedResult).toEqual(userData);
+    })
   })
 });

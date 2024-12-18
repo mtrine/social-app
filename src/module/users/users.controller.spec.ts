@@ -31,6 +31,8 @@ describe('UsersController', () => {
     remove: jest.fn().mockResolvedValue(userData),
     findOneByUsername: jest.fn().mockResolvedValue(userData),
     findOneByEmail: jest.fn().mockResolvedValue(userData),
+    searchByUsername: jest.fn().mockResolvedValue([userData]),
+    followUser: jest.fn().mockResolvedValue(userData),
   };
 
   beforeEach(async () => {
@@ -122,4 +124,17 @@ describe('UsersController', () => {
     })
   })
   
+  describe('searchByUsername', () => {
+    it('should search users by username', async () => {
+      const result = await service.searchByUsername('qnhu1', { limit: 10, currentPage: 1 }) as { data: typeof userData[] };
+      expect(result).toEqual([userData]);
+    })
+  })
+
+  describe('follow user', () => {
+    it('should follow a user', async () => {
+      const user = await service.followUser(userData._id, userData._id);
+      expect(user).toEqual(userData);
+    })
+  })
 });
