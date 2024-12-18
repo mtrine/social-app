@@ -40,7 +40,7 @@ export class PostsService {
     return postListResponse;
   }
 
-  async createComment(postId: string,userId:string,  comment: string) {
+  async createComment(postId: string,userId:string,  comment: any) {
     return await this.postsRepository.createComment(postId, userId ,comment);
   }
 

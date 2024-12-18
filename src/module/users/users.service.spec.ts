@@ -5,10 +5,12 @@ import { mock } from 'node:test';
 import { CreateUserDto } from './dto/create-user.dto';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('UsersService', () => {
   let service: UsersService;
   let userRepository: UserRepository;
+  let cacheManager: Cache;
   const userData = {
     _id: '675512d24dd69ef1b4c17416',
     email: 'qnhu1@gmail.com',
@@ -28,11 +30,18 @@ describe('UsersService', () => {
   const mockUserRepository = {
     create: jest.fn().mockResolvedValue(userData),
     updateById: jest.fn().mockResolvedValue(userData),
-    deleteById: jest.fn().mockResolvedValue(userData),
+    deleteById: jest.fn().mockResolvedValue(userData), 
     findOneByUsername: jest.fn().mockResolvedValue(userData),
     findOneByEmail: jest.fn().mockResolvedValue(userData),
-    searchByUsername: jest.fn().mockResolvedValue([userData])
+    searchByUsername: jest.fn().mockResolvedValue([userData]),
+    countDocuments: jest.fn().mockResolvedValue(1), 
   }
+  const mockCacheManager = {
+    get: jest.fn(),
+    set: jest.fn(),
+    del: jest.fn(),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -40,12 +49,18 @@ describe('UsersService', () => {
         {
           provide: UserRepository,
           useValue: mockUserRepository
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager
         }
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     userRepository = module.get<UserRepository>(UserRepository);
+    cacheManager = module.get<Cache>(CACHE_MANAGER);
+
   });
 
   it('should be defined', () => {
@@ -62,6 +77,7 @@ describe('UsersService', () => {
         gender: true,
       } as CreateUserDto;
       const user = await service.create(createUserDto);
+      (mockCacheManager.del as jest.Mock).mockResolvedValueOnce(null);
       expect(user).toEqual(userData);
     });
     it('should create a user with email exist', async () => {
@@ -97,7 +113,9 @@ describe('UsersService', () => {
 
   describe('remove', () => {
     it('should remove a user', async () => {
+      
       const user = await service.remove(userData._id);
+      expect(mockUserRepository.deleteById).toHaveBeenCalledWith(userData._id); 
       expect(user).toEqual(userData);
     });
   })
@@ -129,8 +147,8 @@ describe('UsersService', () => {
 
   describe('searchByUsername', () => {
     it('should search users by username', async () => {
-      const result = await service.searchByUsername('qnhu1', { limit: 10, currentPage: 1 });
-      expect(result).toEqual([userData]);
+      const result = await service.searchByUsername('qnhu1', { limit: 10, currentPage: 1 }) as { data: typeof userData[] };
+      expect(result.data).toEqual([userData]);
     });
   })
 });

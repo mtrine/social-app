@@ -91,17 +91,19 @@ export class PostsRepository {
     
     
 
-    async createComment(postId: string, userId: string, content: string) {
+    async createComment(postId: string, userId: string, content: any) {
         try {
-            return this.postModel.findByIdAndUpdate(postId, {
+            const postCommented = await this.postModel.findByIdAndUpdate(postId, {
                 $push: {
                     comments: {
                         userId,
-                        content,
+                        content: content.comment,
                         createdAt: new Date(),
                     },
                 },
-            })
+               
+            }, { new: true })
+            return postCommented
         }
         catch (error) {
             console.log(error);

@@ -30,4 +30,11 @@ export class PostsController {
   async getMyNewsfeed(@User() user:IUser,@Query() qs:any) {
     return await this.postsService.getMyNewsfeed(user._id,qs);
   }
+
+  @Post(':postId/comments')
+  @ResponseMessage('Comment created successfully')
+  @Serialize(PostResponseDto)
+  async createComment(@User() user:IUser,@Param('postId') postId: string, @Body() comment: any) {
+    return await this.postsService.createComment(postId,user._id,comment);
+  }
 }

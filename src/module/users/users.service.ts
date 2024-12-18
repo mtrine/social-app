@@ -31,9 +31,10 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    await this.userRepository.deleteById(id);
+   const user  = await this.userRepository.deleteById(id);
     // Xóa cache
     await this.cacheManager.del(`user_${id}`);
+    return user;
   }
 
   async findOneByEmail(email: string) {

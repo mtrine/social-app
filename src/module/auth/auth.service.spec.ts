@@ -7,7 +7,6 @@ import { find } from 'rxjs';
 import { create } from 'domain';
 import { verify } from 'crypto';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import exp from 'constants';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { BadRequestException, ConflictException } from '@nestjs/common';

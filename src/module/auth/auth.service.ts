@@ -98,7 +98,6 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
       });
 
-      console.log('decoded', decoded);
       // Get user ID from token
       const userId = decoded._id;
 
