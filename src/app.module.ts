@@ -7,6 +7,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PostsModule } from './module/posts/posts.module';
+import { ChatsModule } from './module/chats/chats.module';
+import { MessagesModule } from './module/messages/messages.module';
+import { NotificationModule } from './module/notification/notification.module';
+
+
 import * as redisStore from 'cache-manager-redis-store';
 @Module({
   imports: [
@@ -27,7 +32,7 @@ import * as redisStore from 'cache-manager-redis-store';
       port: process.env.REDIS_PORT,
     }),
     UsersModule, 
-    AuthModule, PostsModule],
+    AuthModule, PostsModule, ChatsModule, MessagesModule, NotificationModule],
   controllers: [AppController],
   providers: [AppService],
 })
